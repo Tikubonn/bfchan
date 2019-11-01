@@ -182,4 +182,5 @@ $ make NANAFY_INCLUDE_DIR="" NANAFY_LIBRARY_DIR=""
 
 ## License 
 
-BFChan は [GNU General Public License Version3](LICENSE) の許諾の下で公開されています。
+* BFChan は [Nanafy](https://github.com/tikubonn/nanafy) を使用しています。Nanafy は [MIT License](LICENSE) の許諾の下で公開されています。
+* BFChan は [GNU General Public License Version3](LICENSE) の許諾の下で公開されています。
