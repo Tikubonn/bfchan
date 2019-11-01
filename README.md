@@ -182,4 +182,5 @@ last, please copy files and configure environment variables yourself.
 
 ## License 
 
-BFChan has released under the [GNU General Public License Version3](LICENSE).
+* BFChan has required [Nanafy](https://github.com/tikubonn/nanafy). Nanafy has released under the [MIT License](LICENSE).
+* BFChan has released under the [GNU General Public License Version3](LICENSE).
