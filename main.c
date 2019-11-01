@@ -117,6 +117,7 @@ static int parse_args (
 	bool *optimizep,
 	size_t *workingmemorysizep,
   nanafy_endian *endianp,
+  nanafy_machine *machinep,
 	bool *helpp,
 	bool *versionp){
 	if (init_bfchan_symname(MAIN, sizeof(MAIN) -1, symname) != 0){
@@ -132,6 +133,7 @@ static int parse_args (
 	bool compileascfuncp = false;
 	size_t workingmemorysize = 65536;
   nanafy_endian endian = NANAFY_BIG_ENDIAN;
+  nanafy_machine machine = NANAFY_X86_MACHINE;
 	bool help = false;
 	bool version = false;
 	size_t index = 1;
@@ -169,6 +171,28 @@ static int parse_args (
         return 1;
       }
     }
+    else 
+    if (streq(args[index], "--machine")){
+      if (index +1 < argcount){
+        if (streq(args[index +1], "x86")){
+          machine = NANAFY_X86_MACHINE;
+          index += 2;
+        }
+        else 
+        if (streq(args[index +1], "x64")){
+          machine = NANAFY_X64_MACHINE;
+          index += 2;
+        }
+        else {
+          fprintf(stderr, "error, unsupported cpu type of '%s'.\n", args[index +1]);
+          return 1;
+        }
+      }
+      else {
+        fprintf(stderr, "error, --machine option need a cpu type.\n");
+        return 1;
+      }
+    }
 		else
 		if (streq(args[index], "-O")){
 			optimize = true;
@@ -179,6 +203,7 @@ static int parse_args (
 			optimize = false;
 			index += 1;
 		}
+		else
 		if (streq(args[index], "-m")){
 			if (index +1 < argcount){
 				size_t size;
@@ -187,7 +212,7 @@ static int parse_args (
 					return 1;
 				}
 				workingmemorysize = size;
-				index += 1;
+				index += 2;
 			}
 			else {
 				fprintf(stderr, "error, -m option need a size for working memory size.\n");
@@ -274,6 +299,7 @@ static int parse_args (
 	*optimizep = optimize;
 	*workingmemorysizep = workingmemorysize;
   *endianp = endian;
+	*machinep = machine;
 	*helpp = help;
 	*versionp = version;
 	return 0;
@@ -291,6 +317,7 @@ static void show_help (){
 		"  -O0                        not optimize assembly when compiling.\n"
 		"  -m size                    change the working memory size (default is 65536). if -c option is enabled, this option will be ignored.\n"
     "  --endianness {little|big}  change the endian (default is big).\n"
+    "  --machine {x86|x64}        change the target cpu type (default is x86).\n"
 		"  -h --help                  show the help then exit application.\n"
 		"  -v --version               show the version then exit application.\n"
 	);
@@ -348,6 +375,7 @@ int main (int argcount, char **args){
 	bool optimize;
 	size_t workingmemorysize;
   nanafy_endian endian;
+	nanafy_machine machine;
 	bool help;
 	bool version;
 	if (parse_args(
@@ -359,6 +387,7 @@ int main (int argcount, char **args){
 		&optimize,
 		&workingmemorysize,
     &endian,
+    &machine,
 		&help,
 		&version) != 0){
 		return 1;
@@ -381,7 +410,10 @@ int main (int argcount, char **args){
 		return 1;
 	}
 	nanafy_info nanainfo;
-	setup_nanafy_info_for_x86(endian, &nanainfo);
+	if (setup_nanafy_info(machine, endian, &nanainfo) != 0){
+		fprintf(stderr, "internal error, could not setup nanafy_info.\n");
+		return 1;
+	}
 	nanafy *nana = make_empty_nanafy(NANAFY_SYMNAME_TABLE_DEFAULT_HASH_FUNC, &nanainfo);
 	if (nana == NULL){
 		fprintf(stderr, "internal error, could not make a nanafy instance.\n");
