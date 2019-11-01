@@ -1,0 +1,11 @@
+#include <bfchan.h>
+#include <nanafy.h>
+
+nanafy_status assemble_bfchan_jump_backward_marker_manually (bfchan_operator *operator, bfchan *bfchanp, nanafy *nana){
+	size_t offset = tell_nanafy(NANAFY_TEXT_SECTION, nana);
+	operator->operator.jump.offset = offset;
+	operator->operator.jump.offsetbegin = offset;
+	operator->operator.jump.offsetend = offset;
+	operator->operator.jump.size = 0; // unused member!
+	return NANAFY_SUCCESS;
+}
